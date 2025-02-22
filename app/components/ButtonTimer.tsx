@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 const generateLayouts = () => {
-  const floors = Array.from({ length: 12 }, (_, i) => i + 1);
+  
   return [
     [...Array(6).keys()].flatMap(i => [i + 1, i + 7]),
     [...Array(6).keys()].flatMap(i => [6 - i, 12 - i]),
@@ -12,7 +12,7 @@ const generateLayouts = () => {
   ];
 };
 
-const sendDataToGoogleSheet = async (times) => {
+const sendDataToGoogleSheet = async (times: (number | null)[]) => {
   const url = `https://script.google.com/macros/s/AKfycbzKI0EAuzvHhAaEc8hGxT8GqXGUo6UkrrA1quj5RKPpLW7UlA5DFR-ClJwFSrPMHmphvw/exec?times=${encodeURIComponent(JSON.stringify(times))}`;
   
   const response = await fetch(url, { method: "GET" });
@@ -25,12 +25,12 @@ const sendDataToGoogleSheet = async (times) => {
 
 export default function ElevatorGame() {
   const [started, setStarted] = useState(false);
-  const [targetFloor, setTargetFloor] = useState(null);
-  const [startTime, setStartTime] = useState(null);
-  const [elapsedTimes, setElapsedTimes] = useState([]);
+  const [targetFloor, setTargetFloor] = useState<number | null>(null);
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [elapsedTimes, setElapsedTimes] = useState<(number | null)[]>([])
   const [layoutIndex, setLayoutIndex] = useState(0);
   const [gameFinished, setGameFinished] = useState(false);
-  const [usedFloors, setUsedFloors] = useState([]);
+  const [usedFloors, setUsedFloors] = useState<(number | null)[]>([])
   const layouts = generateLayouts();
 
   const getRandomFloor = () => {
@@ -57,7 +57,7 @@ export default function ElevatorGame() {
     setStartTime(Date.now());
   };
 
-  const handleFloorClick = (floor) => {
+  const handleFloorClick = (floor : number) => {
     if (floor === targetFloor && startTime !== null) {
       const timeTaken = (Date.now() - startTime) / 1000;
       setElapsedTimes(prev => [...prev, timeTaken]);
@@ -113,8 +113,8 @@ export default function ElevatorGame() {
           <h3 className="mb-4 text-4xl font-semibold text-red-600">
             Final Results 
           </h3>
-          {elapsedTimes.map((time, index) => (
-            <p key={index}>Pattern {index + 1} : {time.toFixed(3)} sec</p>
+          {elapsedTimes.map((time: number | null, index) => (
+            <p key={index}>Pattern {index + 1} : {(time ?? 0).toFixed(3)} sec</p>
           ))}
           <button
             onClick={handleRestart}
@@ -148,5 +148,5 @@ export default function ElevatorGame() {
         </div>
       )}
     </div>
-  );
+  )
 }
